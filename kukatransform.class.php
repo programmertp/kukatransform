@@ -5,27 +5,41 @@ class KUKATransform
 	var $basename;
 	var $lin_files = Array();
     var $zipfile;
+    var $zipfile_name;
+    var $last_error;
 	
-	/*
-	 * Process:
-	 * 1. Pass in filename of original source file
-	 * 
-	 * 2. Parse the file to retrieve the LIN lines
-	 * 3. Split into various files
-	 */
-	
-	public function __construct ($filename, $lin_lines_per_file = 8000)
+    /**
+     * Start splitting the given file
+     *
+     * @param string $input_file Absolute path to src file to process
+     * @param string $filename Filename to use when creating the zip file
+     * @param int $lin_lines_per_file Number of LIN lines per file split
+     */
+    public function __construct ($input_file, $filename, $lin_lines_per_file = 8000)
 	{
-		$this->parse_filename($filename);
-		$this->parse_lin_file($filename, $lin_lines_per_file);
+		$this->parse_filename($input_file, $filename);
+		$this->parse_lin_file($input_file, $lin_lines_per_file);
 
         $this->zip_create();
 
-        $this->zip_add_lin_files();
-        $this->zip_add_src_file();
-        $this->zip_add_dat_file();
+        if ($this->zipfile)
+        {
+            $this->zipfile_name = $this->zipfile->filename;
 
-        $this->zip_close();
+            $this->zip_add_lin_files();
+
+            if ($this->zip_add_src_file() === false)
+            {
+                return false;
+            }
+
+            if ($this->zip_add_dat_file() === false)
+            {
+                return false;
+            }
+
+            $this->zipfile->close();
+        }
 	}
 
     /**
@@ -35,7 +49,7 @@ class KUKATransform
      */
     public function zip_filename()
     {
-        return $this->zipfile->filename;
+        return $this->zipfile_name;
     }
 
     /**
@@ -54,18 +68,21 @@ class KUKATransform
 	/*
 	 * Strip the bits we need out of our input filename
 	 *
-	 * @input string $filename Filename to process
+	 * @input string $input_file Absolute path to file to process
+	 * @input string $filename Filename to store results in
 	 *
-	 * @return bool Always true, v. lazy
+	 * @return bool Success state
 	 */
-	private function parse_filename ($filename)
+	private function parse_filename ($input_file, $filename)
 	{
-		$realpath = realpath($filename);
+		$realpath = realpath($input_file);
 		$pathinfo = pathinfo($realpath);
-		
+
+        $filename = explode('.', $filename);
+
 		$this->basedir 	= $pathinfo['dirname'];
-		$this->basename = $pathinfo['filename'];
-		
+		$this->basename = $filename[0];
+
 		return true;
 	}
 
@@ -80,6 +97,7 @@ class KUKATransform
 
         if ($this->zipfile === false)
         {
+            $this->last_error = "ZipArchive not available";
             return false;
         }
 
@@ -111,6 +129,7 @@ class KUKATransform
     {
         if (empty($this->lin_files) == true)
         {
+            $this->last_error = "No LIN parts available.";
             return false;
         }
 
@@ -123,6 +142,7 @@ class KUKATransform
 
             if ($this->zipfile->addFromString($filename, $contents) === false)
             {
+                $this->last_error = "Failed to add LIN part file.";
                 return false;
             }
         }
@@ -137,10 +157,11 @@ class KUKATransform
      */
     private function zip_add_src_file()
     {
-        $template_src = file_get_contents("TEMPLATE.SRC");
+        $template_src = file_get_contents(__DIR__."/TEMPLATE.SRC");
 
         if (empty($template_src) === true)
         {
+            $this->last_error = "Failed to read template file ".__DIR__."/TEMPLATE.SRC";
             return false;
         }
 
@@ -164,10 +185,11 @@ class KUKATransform
      */
     private function zip_add_dat_file()
     {
-        $template_dat = file_get_contents("TEMPLATE.DAT");
+        $template_dat = file_get_contents(__DIR__."/TEMPLATE.DAT");
 
         if (empty($template_dat) === true)
         {
+            $this->last_error = "Failed to read template file ".__DIR__."/TEMPLATE.DAT";
             return false;
         }
 
