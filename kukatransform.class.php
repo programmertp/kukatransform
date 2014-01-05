@@ -28,6 +28,29 @@ class KUKATransform
         $this->zip_close();
 	}
 
+    /**
+     * Retrieves the filename of the zip file opened
+     *
+     * @return string Absolute path to the zip file
+     */
+    public function zip_filename()
+    {
+        return $this->zipfile->filename;
+    }
+
+    /**
+     * Delete the zip file once download is complete
+     *
+     * @return bool
+     */
+    public function zip_remove()
+    {
+        if (empty($this->zipfile) === false)
+        {
+            return unlink($this->zipfile->filename);
+        }
+    }
+
 	/*
 	 * Strip the bits we need out of our input filename
 	 *
