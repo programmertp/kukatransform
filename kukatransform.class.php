@@ -138,7 +138,7 @@ class KUKATransform
             $lin_part = $c+1;
 
             $filename = "{$this->basename}/{$this->basename}_{$lin_part}.src";
-            $contents = "DEF {$this->basename}_{$lin_part}()\n".implode("\n", $this->lin_files[$c])."END\n";
+            $contents = "DEF {$this->basename}_{$lin_part}()\r\n".implode("\r\n", $this->lin_files[$c])."END\r\n";
 
             if ($this->zipfile->addFromString($filename, $contents) === false)
             {
@@ -169,7 +169,7 @@ class KUKATransform
 
         for ($c = 0; $c < count($this->lin_files); $c++)
         {
-            $lin_callers .= "{$this->basename}_".($c+1)."()\n";
+            $lin_callers .= "{$this->basename}_".($c+1)."()\r\n";
         }
 
         $template_src = str_replace("Template_Base1", $this->basename, $template_src);
