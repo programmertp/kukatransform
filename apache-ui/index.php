@@ -1,5 +1,6 @@
 <?php
-require_once("../kukatransform.class.php");
+require_once("../kukatransform.php");
+require_once("../camrobtransform.php");
 
 // Quick and dirty input form processor
 $error_msg = "";
@@ -25,7 +26,19 @@ if (empty($_POST) === false)
 
     if ($error_msg == "")
     {
-        $KT = new KUKATransform($_FILES['input_file']['tmp_name'], $_FILES['input_file']['name'], $_POST['split_lines']);
+	    $class = "";
+
+	    switch ($_POST['transform'])
+	    {
+		    case 'original':
+			    $class = "KUKATransform";
+			    break;
+		    case 'camrob':
+				$class = "CAMRobTransform";
+			    break;
+	    }
+
+        $KT = new $class($_FILES['input_file']['tmp_name'], $_FILES['input_file']['name'], $_POST['split_lines']);
 
         $zip_file = $KT->zip_filename();
 
@@ -36,6 +49,7 @@ if (empty($_POST) === false)
         else
         {
             $zip_contents = file_get_contents($zip_file);
+
             $filename = $KT->basename.'.zip';
             $KT->zip_remove();
 
@@ -73,6 +87,11 @@ if ($error_msg !== "")
             <input type="file" name="input_file" value="Select input SRC file" /><br />
             Number of LIN lines per file: <input type="text" name="split_lines" value="8000" size="4" /><br />
             <br />
+	        Transform type:
+	        <select name="transform">
+		        <option value="original">Original</option>
+		        <option value="camrob">CamRob to Standard KRL Convertor</option>
+	        </select>
             <input type="submit" name="submit" value="Start transform" /><br />
         </form>
     </body>

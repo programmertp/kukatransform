@@ -1,0 +1,83 @@
+;FOLD SET JOBINFO HTML FILENAME
+  APP_sHTML_JOBINFO[] = "at\at.htm"
+;ENDFOLD
+
+;FOLD CHECK DAT-FILE GENERATION NUMBER
+  IF APP_GENNUMBER <> 358192 THEN
+    LOOP
+      APP_MESS (1,,APP_ANSWER)
+      HALT
+    ENDLOOP
+  ENDIF
+;ENDFOLD
+
+
+;Job name: at information
+;Product : KUKA.ApplicationsPC 2.1.0 (#1174)
+;Date: 2014-03-18 15:54
+;Project name: at
+;Author: My Author
+;Company: My Company
+;Division: My Division
+;Comment: My Comment
+
+; Set the version for the user param source files:
+CR_iUSER_PARAMS_VERSION = 2
+CR_SPINDLE_VEL( 0, #CLW)
+;fold Axes definitions
+; Axis1 [-185 185] Rot [deg] (KR 60 L30 HA)
+; Axis2 [-135 35] Rot [deg] (KR 60 L30 HA)
+; Axis3 [-120 158] Rot [deg] (KR 60 L30 HA)
+; Axis4 [-350 350] Rot [deg] (KR 60 L30 HA)
+; Axis5 [-119 119] Rot [deg] (KR 60 L30 HA)
+; Axis6 [-350 350] Rot [deg] (KR 60 L30 HA)
+;endfold
+;fold Tools and Bases used
+; $ROBROOT = {x 0,y 0,z 0,a 0,b 0,c 0}
+; BASE_DATA[1] = {x 2000,y 0,z 10,a 0,b 0,c 0}
+; TOOL_DATA[1] = {x 450.976,y 1.657,z 93.723,a 180,b 0,c 0}
+;endfold
+;at
+;Cell
+;KR 60 L30 HA
+;BaseData
+;ToolData
+;Motor
+;BallNose
+;Table
+;Clamp table
+;Block
+;Job (KUKA.CAMRobPC)
+;FOLD PTP P1  Vel= 50 % PDATP1;%{PE}%R 5.2.26,%MKUKATPBASIS,%CMOVE,%VPTP,%P 1:PTP, 2:P1, 3:, 5:50, 7:PDATP1
+$BWDSTART = FALSE
+PDAT_ACT=PPDATP1
+FDAT_ACT=FP1
+BAS (#PTP_PARAMS,50)
+$H_POS=XP1
+PTP  XP1 
+;ENDFOLD
+;FOLD PTP P2 Vel= 50 % PDATP2 TOOL[0] BASE[0];%{PE}%R 5.2.26,%MKUKATPBASIS,%CMOVE,%VPTP,%P 1:PTP, 2:P2, 3:, 5:50, 7:PDATP2
+$BWDSTART = FALSE
+PDAT_ACT=PPDATP2
+FDAT_ACT=FP2
+BAS (#PTP_PARAMS,50)
+PTP  XP2 
+;ENDFOLD
+
+;FOLD CAMRob.Set Aproximation Type
+  CR_eAPO=#CDIS
+  CR_rAPO_CDIS=2
+  CR_rAPO_CVEL=10
+;ENDFOLD
+
+;FOLD CAMRob.LoadTool = 1 [1..100];%{PE}%MKUKATPUSER
+  CR_LOAD_TOOL( 1)
+;ENDFOLD
+
+;--Start-- F:\1.tap
+;BASE_DATA[1]
+;TOOL_DATA[1]
+;ToolTable[1]
+$TOOL = {x 450.976,y 1.657,z 93.723,a 180,b 0,c 0}
+;$BASE = {x 2000,y 0,z 10,a 0,b 0,c 0}:{x 0,y 0,z 0,a 0,b 0,c 0}
+$BASE = BASE_DATA[1]:{x 0,y 0,z 0,a 0,b 0,c 0}
