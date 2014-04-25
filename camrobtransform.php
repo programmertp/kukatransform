@@ -65,22 +65,20 @@ class CAMRobTransform
 
 	private function update_feedrate()
 	{
-		$search =   "/;Fold Set user params
-CR_rPARAMS\[1\] = \d+\s+;LineNr
-CR_rPARAMS\[2\] = ([\d.]+)\s+;Feedrate m\/s
-CR_rPARAMS\[3\] = \d+\s+;Spindle on\/off
-CR_rPARAMS\[4\] = \d+\s+;SpindleSpeed rpm
-CR_rPARAMS\[5\] = \d\s+;Spindle rot
-CR_rPARAMS\[6\] = \d\s+;Coolant
-CR_rPARAMS\[7\] = \d\s+;ToolNo
-CR_rPARAMS\[8\] = [\$ac\.p\d]+\s+;OptimAcc m\/s2
-CR_USER_PARAMS_ADV \(\)
-TRIGGER WHEN DISTANCE = 0 DELAY = 0 DO CR_USER_PARAMS_TRIG \(\) PRIO = -1
-;Endfold/";
+		$search =   "/;Fold Set user params\r
+CR_rPARAMS\[1\] = \d+\s+;LineNr\r
+CR_rPARAMS\[2\] = ([\d.]+)\s+;Feedrate m\/s\r
+CR_rPARAMS\[3\] = \d+\s+;Spindle on\/off\r
+CR_rPARAMS\[4\] = \d+\s+;SpindleSpeed rpm\r
+CR_rPARAMS\[5\] = \d\s+;Spindle rot\r
+CR_rPARAMS\[6\] = \d\s+;Coolant\r
+CR_rPARAMS\[7\] = \d\s+;ToolNo\r
+CR_rPARAMS\[8\] = [\$ac\.p\d]+\s+;OptimAcc m\/s2\r
+CR_USER_PARAMS_ADV \(\)\r
+TRIGGER WHEN DISTANCE = 0 DELAY = 0 DO CR_USER_PARAMS_TRIG \(\) PRIO = -1\r
+;Endfold\r/";
 
 		$this->file_contents = preg_replace($search, "\$VEL.CP = \\1\r\n", $this->file_contents);
-		print "<pre>".$this->file_contents;
-		die();
 	}
 
 	private function update_end()
